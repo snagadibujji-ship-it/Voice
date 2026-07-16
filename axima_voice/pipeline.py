@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from typing import Any, Dict
 
 from .meaning_parser import parse_meaning
+from .performance_graph import build_performance_graph
 from .phonemes import text_to_phonemes
 from .prosody import plan_prosody
 from .text_normalizer import normalize_text
@@ -18,6 +19,7 @@ class AximaVoice:
         meaning = parse_meaning(normalized)
         prosody = plan_prosody(meaning)
         phonemes = text_to_phonemes(normalized, prosody=prosody)
+        performance_graph = build_performance_graph(normalized, meaning, prosody)
 
         return {
             "text": text,
@@ -25,4 +27,5 @@ class AximaVoice:
             "meaning": meaning,
             "prosody": prosody,
             "phonemes": phonemes,
+            "performance_graph": performance_graph.to_dict(),
         }
