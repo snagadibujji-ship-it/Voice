@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "axima-voice"
+version = "0.1.0"
+description = "Meaning-first experimental voice engine for Axima"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.setuptools]
+packages = ["axima_voice"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
