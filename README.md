@@ -17,14 +17,30 @@ Text → Normalize → Meaning → Prosody → Phonemes → Source → Filter �
 - Expose a modular pipeline that can evolve over time
 - Support future meaning-aware speech generation
 
-## Current Phase
+## Phase 0 Status: Closed ✅
 
-Phase 0: repo bootstrap
+Phase 0 delivered the project bootstrap and the first orchestration layer.
 
-- README
-- Python skeleton
-- Pipeline interface
-- First synthesis stub
+### Completed in Phase 0
+
+- Repository initialization
+- Python package skeleton
+- CLI entrypoint
+- Smoke test scaffold
+- Text normalization
+- Meaning parser stub
+- Prosody planner stub
+- Phoneme token planner
+- Performance graph scaffold
+- WAV output utility
+
+### What Phase 0 was still missing before closure
+
+- Real waveform synthesis
+- Real speech playback path
+- Pronunciation-quality phoneme mapping
+- Streaming audio engine
+- End-to-end audible demo
 
 ## Proposed Package Layout
 
@@ -37,19 +53,23 @@ axima_voice/
   meaning_parser.py
   prosody.py
   phonemes.py
+  performance_graph.py
   source.py
   filter.py
   synth.py
   wav_io.py
 ```
 
-## Next Milestones
+## Next Phase: Phase 1
 
-1. Text normalization
-2. Minimal grapheme-to-phoneme mapping
-3. WAV generation
-4. First understandable voice output
-5. Prosody and emotion planning
+Phase 1 will turn the scaffold into real audio output.
+
+### Phase 1 target
+
+- Build a minimal synthesis path
+- Generate non-silent speech-like audio
+- Add timing and waveform structure
+- Produce the first understandable spoken demo
 
 ## Vision
 
