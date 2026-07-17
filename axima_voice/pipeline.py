@@ -11,6 +11,7 @@ from .phase4 import build_live_playback_plan
 from .phase5 import build_composition_plan
 from .phase6 import MusicRenderer, build_fusion_plan, build_singing_plan, PersonalityMemory
 from .phase7 import apply_coarticulation, build_realism_plan
+from .phase8 import build_phase8_plan
 from .phonemes import text_to_phonemes
 from .prosody import plan_prosody
 from .simple_synth import SimpleSynthesizer
@@ -30,6 +31,7 @@ class AximaVoice:
         meaning = parse_meaning(normalized)
         prosody = plan_prosody(meaning)
         realism_plan = build_realism_plan(normalized, meaning)
+        phase8_plan = build_phase8_plan(realism_plan)
         performance_plan = build_phase2_plan(normalized, meaning, prosody)
         composition_plan = build_composition_plan(normalized, meaning, performance_plan.to_dict())
         fusion_plan = build_fusion_plan(normalized, composition_plan)
@@ -51,6 +53,7 @@ class AximaVoice:
             "meaning": meaning,
             "prosody": prosody,
             "realism_plan": realism_plan.to_dict(),
+            "phase8_plan": phase8_plan.to_dict(),
             "performance_plan": performance_plan.to_dict(),
             "composition_plan": composition_plan.to_dict(),
             "fusion_plan": fusion_plan.to_dict(),
