@@ -7,6 +7,7 @@ from .meaning_parser import parse_meaning
 from .performance_graph import build_performance_graph
 from .phase2 import build_phase2_plan
 from .phase3 import build_streaming_plan
+from .phase4 import build_live_playback_plan
 from .phonemes import text_to_phonemes
 from .prosody import plan_prosody
 from .simple_synth import SimpleSynthesizer
@@ -31,6 +32,7 @@ class AximaVoice:
             phonemes,
             performance_graph=performance_graph,
         )
+        live_playback_plan = build_live_playback_plan(streaming_plan, len(audio), sample_rate=self.synthesizer.sample_rate)
 
         return {
             "text": text,
@@ -39,6 +41,7 @@ class AximaVoice:
             "prosody": prosody,
             "performance_plan": performance_plan.to_dict(),
             "streaming_plan": streaming_plan.to_dict(),
+            "live_playback_plan": live_playback_plan.to_dict(),
             "phonemes": phonemes,
             "performance_graph": performance_graph.to_dict(),
             "audio": audio,
