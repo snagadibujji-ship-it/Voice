@@ -167,6 +167,29 @@ Phase 6 added the first real audio generation branch for music, singing prep, an
 - Rich harmony control
 - Real speech-music blending at runtime
 
+## Phase 7 Status: Closed ✅
+
+Phase 7 added the realism engine for stronger speech naturalness.
+
+### Completed in Phase 7
+
+- Phoneme dictionary
+- Grapheme-to-phoneme fallback engine
+- Coarticulation planning
+- Emotion rendering
+- Prosody curves
+- Voice identity model
+- Pipeline integration for realism planning
+- Realism tests
+
+### What Phase 7 still leaves for later phases
+
+- Higher-quality pronunciation modeling
+- More detailed coarticulation rules
+- Better emotion-to-audio rendering
+- More refined prosody timing
+- Real-time expressive playback using the realism layer
+
 ## Proposed Package Layout
 
 ```text
@@ -184,6 +207,7 @@ axima_voice/
   phase4.py
   phase5.py
   phase6.py
+  phase7.py
   source.py
   filter.py
   synth.py
@@ -194,7 +218,7 @@ axima_voice/
 
 ## Next Phase Target
 
-Phase 7 will focus on improving the realism of generated music, adding stronger singing behavior, and blending speech with music more naturally.
+Phase 8 will focus on making the realism layer affect actual audio rendering more deeply and moving closer to natural, expressive, controllable voice behavior.
 
 ## Vision
 
