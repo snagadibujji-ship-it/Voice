@@ -52,11 +52,11 @@ class SimpleSynthesizer:
         if phase9_plan is not None:
             runtime_control = phase9_plan.runtime_control
             if runtime_control.emotion in {"excited", "urgent"}:
-                energy *= 1.06
-                pitch *= 1.02
+                energy *= 1.08
+                pitch *= 1.025
             elif runtime_control.emotion == "soft":
-                energy *= 0.92
-                pitch *= 0.98
+                energy *= 0.9
+                pitch *= 0.97
             else:
                 energy *= 1.0
             rendering_profile = phase9_plan.phase8_plan.rendering_profile
@@ -84,30 +84,40 @@ class SimpleSynthesizer:
 
             if runtime_control is not None:
                 if token in {"_", "~"}:
-                    token_duration *= 0.82
+                    token_duration *= 0.8
                 if index in runtime_pause_map:
                     pause_after = max(pause_after or 0.0, runtime_pause_map[index])
+                if runtime_control.emotion == "soft":
+                    token_duration *= 1.05
+                elif runtime_control.emotion in {"excited", "urgent"}:
+                    token_duration *= 0.95
 
             freq = base_freq + (ord(token[0]) % 24) * 8.0 if token else base_freq
-            freq *= token_pitch if control else token_pitch
-            duration = max(0.035, token_duration * (0.82 if token in {"_", "~"} else 1.0))
+            freq *= token_pitch
+            duration = max(0.032, token_duration * (0.82 if token in {"_", "~"} else 1.0))
             count = max(1, int(rendering_profile.sample_rate * duration))
             formant_shift = 1.0 + rendering_profile.harmonic_depth * 0.02
             breathiness_boost = rendering_profile.breathiness
             if runtime_control is not None and runtime_control.emotion == "soft":
-                breathiness_boost *= 1.5
+                breathiness_boost *= 1.55
             elif runtime_control is not None and runtime_control.emotion in {"excited", "urgent"}:
-                breathiness_boost *= 0.85
+                breathiness_boost *= 0.82
+
+            token_runtime_energy = token_energy
+            if runtime_control is not None:
+                token_runtime_energy *= self._runtime_energy_boost(runtime_control.emotion, index, word_count)
+                token_runtime_energy *= self._presence_boost(runtime_control.emotion, index, word_count)
+                token_runtime_energy *= self._breath_boost(runtime_pause_map, index)
 
             for n in range(count):
                 t = n / rendering_profile.sample_rate
                 tone = math.sin(2.0 * math.pi * freq * t)
                 harmonic = rendering_profile.harmonic_depth * math.sin(2.0 * math.pi * (freq * 2.0 * formant_shift) * t)
                 breath = breathiness_boost * math.sin(2.0 * math.pi * (freq * 0.5) * t)
+                runtime_motion = self._sentence_motion(runtime_control.emotion, index, word_count) if runtime_control is not None else 1.0
                 envelope = self._envelope(n, count)
                 emphasis = control.emphasis if control else 1.0
-                runtime_emphasis = runtime_frame["energy_scale"] if runtime_frame is not None else 1.0
-                value = (tone + harmonic + breath) * envelope * 0.18 * energy * token_energy * emphasis * runtime_emphasis
+                value = (tone + harmonic + breath) * envelope * 0.18 * energy * token_energy * emphasis * runtime_motion * token_runtime_energy
                 samples.append(value)
 
             if pause_after is not None:
@@ -144,6 +154,44 @@ class SimpleSynthesizer:
                     "pause_scale": frame.pause_scale,
                 }
         return frame_map
+
+    def _runtime_energy_boost(self, emotion: str, index: int, total: int) -> float:
+        if total <= 1:
+            return 1.0
+        ratio = index / max(1, total - 1)
+        if emotion == "excited":
+            return 1.0 + 0.05 * ratio
+        if emotion == "soft":
+            return 0.95 - 0.02 * ratio
+        if emotion == "urgent":
+            return 1.05 + 0.03 * ratio
+        return 1.0 + 0.01 * (0.5 - ratio)
+
+    def _presence_boost(self, emotion: str, index: int, total: int) -> float:
+        if total <= 1:
+            return 1.0
+        if index == 0 and total > 2:
+            return 0.98 if emotion in {"soft", "neutral"} else 1.01
+        if index == total - 1:
+            return 1.02 if emotion in {"excited", "urgent"} else 1.0
+        return 1.0
+
+    def _breath_boost(self, pause_map: dict[int, float], index: int) -> float:
+        if index in pause_map:
+            return 1.0 + min(0.08, pause_map[index] * 0.15)
+        return 1.0
+
+    def _sentence_motion(self, emotion: str | None, index: int, total: int) -> float:
+        if emotion is None or total <= 1:
+            return 1.0
+        ratio = index / max(1, total - 1)
+        if emotion == "excited":
+            return 1.02 + 0.05 * ratio
+        if emotion == "soft":
+            return 0.98 - 0.02 * ratio
+        if emotion == "urgent":
+            return 1.03 + 0.02 * ratio
+        return 1.0 + 0.01 * (0.5 - ratio)
 
     def _silence(self, seconds: float) -> List[float]:
         count = max(0, int(self.sample_rate * seconds))
