@@ -10,6 +10,7 @@ from .phase3 import build_streaming_plan
 from .phase4 import build_live_playback_plan
 from .phase5 import build_composition_plan
 from .phase6 import MusicRenderer, build_fusion_plan, build_singing_plan, PersonalityMemory
+from .phase7 import apply_coarticulation, build_realism_plan
 from .phonemes import text_to_phonemes
 from .prosody import plan_prosody
 from .simple_synth import SimpleSynthesizer
@@ -28,6 +29,7 @@ class AximaVoice:
         normalized = normalize_text(text)
         meaning = parse_meaning(normalized)
         prosody = plan_prosody(meaning)
+        realism_plan = build_realism_plan(normalized, meaning)
         performance_plan = build_phase2_plan(normalized, meaning, prosody)
         composition_plan = build_composition_plan(normalized, meaning, performance_plan.to_dict())
         fusion_plan = build_fusion_plan(normalized, composition_plan)
@@ -41,12 +43,14 @@ class AximaVoice:
         )
         live_playback_plan = build_live_playback_plan(streaming_plan, len(speech_audio), sample_rate=self.synthesizer.sample_rate)
         music_audio = self.music_renderer.render(composition_plan)
+        coarticulated_phonemes = apply_coarticulation(realism_plan.phoneme_words)
 
         return {
             "text": text,
             "normalized_text": normalized,
             "meaning": meaning,
             "prosody": prosody,
+            "realism_plan": realism_plan.to_dict(),
             "performance_plan": performance_plan.to_dict(),
             "composition_plan": composition_plan.to_dict(),
             "fusion_plan": fusion_plan.to_dict(),
@@ -54,6 +58,7 @@ class AximaVoice:
             "streaming_plan": streaming_plan.to_dict(),
             "live_playback_plan": live_playback_plan.to_dict(),
             "phonemes": phonemes,
+            "coarticulated_phonemes": coarticulated_phonemes,
             "performance_graph": performance_graph.to_dict(),
             "speech_audio": speech_audio,
             "music_audio": music_audio,
