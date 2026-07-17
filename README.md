@@ -84,6 +84,24 @@ Phase 2 added expressive performance planning and voice identity controls.
 - More advanced pronunciation and coarticulation
 - Music and singing branch
 
+## Phase 3 Status: In Progress 🔥
+
+Phase 3 is focusing on streaming, interruption handling, and conversational timing.
+
+### Completed in Phase 3 so far
+
+- Streaming plan structure
+- Conversation state tracking
+- Chunk splitting for low-latency output
+
+### Still remaining in Phase 3
+
+- Wire streaming plan into pipeline
+- Generate audio per chunk
+- Support interruption-aware turn handling
+- Add a real streaming demo command
+- Add tests for chunking and first-audio latency
+
 ## Proposed Package Layout
 
 ```text
@@ -97,6 +115,7 @@ axima_voice/
   phonemes.py
   performance_graph.py
   phase2.py
+  phase3.py
   source.py
   filter.py
   synth.py
