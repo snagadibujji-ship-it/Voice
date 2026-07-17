@@ -190,25 +190,27 @@ Phase 7 added the realism engine for stronger speech naturalness.
 - More refined prosody timing
 - Real-time expressive playback using the realism layer
 
-## Phase 8 Status: In Progress 🔥
+## Phase 8 Status: Closed ✅
 
-Phase 8 is making the realism layer affect actual audio rendering more deeply and moving closer to natural, expressive, controllable voice behavior.
+Phase 8 made the realism layer actually affect waveform synthesis.
 
-### Completed in Phase 8 so far
+### Completed in Phase 8
 
 - Audio control map
 - Audio rendering profile
 - Phase 8 plan structure
+- Control-aware waveform synthesis
 - Pipeline integration for audio control planning
 - Audio control tests
+- Real audio verification for expressive controls
 
-### Still remaining in Phase 8
+### What Phase 8 still leaves for later phases
 
-- Apply control map directly in the waveform synthesizer
-- Smooth pitch and energy transitions in audio generation
-- Reduce robotic timing in the actual sound output
-- Add real expressive playback checks
-- Improve speech-musical blending from control values
+- Even smoother pitch and energy transitions
+- More advanced coarticulation-driven rendering
+- Better voice identity fine-tuning
+- More natural emotional contouring
+- Live expressive playback that reacts in real time
 
 ## Proposed Package Layout
 
@@ -239,7 +241,7 @@ axima_voice/
 
 ## Next Phase Target
 
-Phase 8 will continue by pushing the new realism control into actual audio synthesis so the voice sounds more human and less synthetic.
+Phase 9 will focus on live expressiveness: smoother transitions, stronger runtime emotion shaping, and richer real-time control over speech behavior.
 
 ## Vision
 
