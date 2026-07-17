@@ -237,50 +237,79 @@ Phase 9 added runtime execution behavior for interruption, pause, resume, and ru
 - More natural speech response under interruption
 - Production-grade voice assistant turn-taking
 
-## Phase 10 Planning Report
+## Phase 10 Status: In Progress 🔥
 
-### Phase 10 Goal
+Phase 10 is building the streaming voice engine foundation.
 
-Streaming Voice Engine.
+### Completed in Phase 10 so far
 
-### Architecture
+- Voice director
+- Streaming scheduler
+- Runtime chunk engine
+- State recovery engine
+- Streaming metrics engine
+- Pipeline integration for streaming execution structures
+- Phase 10 execution tests
+
+### Still remaining in Phase 10
+
+- Real predictive speech emission before full response completion
+- Live playback controller with true chunk-by-chunk streaming behavior
+- Interruption during a live playback stream
+- Resume from recovered stream chunk state
+- Measure real chunk latency in execution paths
+
+## Phase 10 Architecture
 
 ```text
-Text / Response
-  ↓
-Chunk Scheduler
-  ↓
-Streaming Control Plan
-  ↓
-Chunk-by-chunk Synthesis
-  ↓
-Playback Stream
-  ↓
-Interrupt / Resume / Continue
+Input
+↓
+Thought Stream
+↓
+Voice Director
+↓
+Streaming Scheduler
+↓
+Runtime Chunk Engine
+↓
+State Recovery Layer
+↓
+Playback Controller
+↓
+Metrics Engine
+↓
+Output
 ```
 
-### Technical Risks
+## Phase 10 Reality Split
 
-- Chunk boundaries can create unnatural joins.
-- Streaming latency may be inconsistent without a true player loop.
-- Interrupt/resume logic can become fragile if state is not preserved per chunk.
-- Audio quality may drop if streaming is rushed before the chunk scheduler is stable.
+### REAL
 
-### Success Criteria
+- scheduler execution structures
+- runtime chunk execution structures
+- state recovery round-trip
+- runtime controller behavior
+- streaming metrics output fields
 
-- first audio begins quickly
-- chunks generate in sequence
-- playback can interrupt and resume
-- streaming state is tracked correctly
-- latency metrics are measurable per stream
+### PARTIAL
 
-### Build Plan
+- chunked generation
+- interruption awareness
+- resume behavior
+- predictive speech readiness
 
-1. Add a chunk scheduler that can split a response into runtime-safe audio segments.
-2. Convert the current synthesis result into chunked generation output.
-3. Add a streaming playback controller with pause/resume/interrupt behavior.
-4. Track per-chunk and end-to-end latency.
-5. Add tests for chunk order, interruption, resume, and metrics.
+### SIMULATED
+
+- live playback device control
+- full streaming voice mode
+- true real-time interruption mid-playback
+
+### UNSOLVED
+
+- low-latency audio-device playback engine
+- natural predictive speech in a live stream
+- high-quality chunk boundary continuity under interruption
+- production-grade turn-taking
 
 ## Proposed Package Layout
 
@@ -302,6 +331,11 @@ axima_voice/
   phase7.py
   phase8.py
   phase9.py
+  voice_director.py
+  streaming_scheduler.py
+  runtime_chunks.py
+  state_recovery.py
+  streaming_metrics.py
   runtime_engine.py
   source.py
   filter.py
@@ -311,6 +345,10 @@ axima_voice/
   wav_io.py
 ```
 
+## Next Phase Target
+
+Phase 10 will keep pushing toward a real streaming runtime by improving predictive speech, live interruption handling, and stateful chunk playback.
+
 ## What is real
 
 - speech waveform generation
@@ -318,7 +356,8 @@ axima_voice/
 - control-aware synthesis
 - runtime execution controller
 - latency tracking
-- phase-to-pipeline integration
+- streaming execution scaffolding
+- state recovery scaffolding
 - testable audio output paths
 
 ## What is simulated
