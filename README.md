@@ -84,23 +84,25 @@ Phase 2 added expressive performance planning and voice identity controls.
 - More advanced pronunciation and coarticulation
 - Music and singing branch
 
-## Phase 3 Status: In Progress 🔥
+## Phase 3 Status: Closed ✅
 
-Phase 3 is focusing on streaming, interruption handling, and conversational timing.
+Phase 3 added streaming conversation planning and chunked turn structure.
 
-### Completed in Phase 3 so far
+### Completed in Phase 3
 
 - Streaming plan structure
 - Conversation state tracking
 - Chunk splitting for low-latency output
+- Pipeline integration for streaming planning
+- Streaming chunk tests
 
-### Still remaining in Phase 3
+### What Phase 3 still leaves for later phases
 
-- Wire streaming plan into pipeline
-- Generate audio per chunk
-- Support interruption-aware turn handling
-- Add a real streaming demo command
-- Add tests for chunking and first-audio latency
+- Wire real per-chunk audio generation
+- Interruption-aware playback runtime
+- Real first-audio latency measurements
+- More advanced conversational turn control
+- Streaming player / live audio engine
 
 ## Proposed Package Layout
 
@@ -126,7 +128,7 @@ axima_voice/
 
 ## Next Phase Target
 
-Phase 3 will make Axima feel more alive in real conversation by focusing on streaming, interruption handling, and conversational timing.
+Phase 4 will focus on real streaming playback, interruption-aware voice mode behavior, and stronger speech realism.
 
 ## Vision
 
