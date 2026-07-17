@@ -104,6 +104,27 @@ Phase 3 added streaming conversation planning and chunked turn structure.
 - More advanced conversational turn control
 - Streaming player / live audio engine
 
+## Phase 4 Status: Closed ✅
+
+Phase 4 added the live runtime planning layer for voice-mode behavior.
+
+### Completed in Phase 4
+
+- Live playback plan structure
+- Playback chunk mapping
+- Interruption-aware runtime state
+- First-audio latency target planning
+- Pipeline integration for live playback planning
+- Runtime tests for playback chunk mapping
+
+### What Phase 4 still leaves for later phases
+
+- Real chunk-by-chunk audio playback engine
+- Actual interruption handling at playback time
+- Real latency measurement in execution
+- More advanced live conversation control
+- Music and singing branch
+
 ## Proposed Package Layout
 
 ```text
@@ -118,6 +139,7 @@ axima_voice/
   performance_graph.py
   phase2.py
   phase3.py
+  phase4.py
   source.py
   filter.py
   synth.py
@@ -128,7 +150,7 @@ axima_voice/
 
 ## Next Phase Target
 
-Phase 4 will focus on real streaming playback, interruption-aware voice mode behavior, and stronger speech realism.
+Phase 5 will focus on making the live runtime truly interactive, with more natural interruption behavior and stronger voice-mode realism.
 
 ## Vision
 
