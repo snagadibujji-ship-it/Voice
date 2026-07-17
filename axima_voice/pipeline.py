@@ -42,6 +42,7 @@ class AximaVoice:
         speech_audio = self.synthesizer.synthesize(
             phonemes,
             performance_graph=performance_graph,
+            phase8_plan=phase8_plan,
         )
         live_playback_plan = build_live_playback_plan(streaming_plan, len(speech_audio), sample_rate=self.synthesizer.sample_rate)
         music_audio = self.music_renderer.render(composition_plan)
