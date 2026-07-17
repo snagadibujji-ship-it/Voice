@@ -5,8 +5,9 @@ from typing import Any, Dict
 
 from .meaning_parser import parse_meaning
 from .performance_graph import build_performance_graph
-from .phonemes import text_to_phonemes
 from .phase2 import build_phase2_plan
+from .phase3 import build_streaming_plan
+from .phonemes import text_to_phonemes
 from .prosody import plan_prosody
 from .simple_synth import SimpleSynthesizer
 from .text_normalizer import normalize_text
@@ -25,6 +26,7 @@ class AximaVoice:
         performance_plan = build_phase2_plan(normalized, meaning, prosody)
         phonemes = text_to_phonemes(normalized, prosody=prosody)
         performance_graph = build_performance_graph(normalized, meaning, prosody)
+        streaming_plan = build_streaming_plan(normalized, meaning, performance_plan.to_dict())
         audio = self.synthesizer.synthesize(
             phonemes,
             performance_graph=performance_graph,
@@ -36,6 +38,7 @@ class AximaVoice:
             "meaning": meaning,
             "prosody": prosody,
             "performance_plan": performance_plan.to_dict(),
+            "streaming_plan": streaming_plan.to_dict(),
             "phonemes": phonemes,
             "performance_graph": performance_graph.to_dict(),
             "audio": audio,
