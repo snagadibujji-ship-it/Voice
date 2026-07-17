@@ -190,6 +190,26 @@ Phase 7 added the realism engine for stronger speech naturalness.
 - More refined prosody timing
 - Real-time expressive playback using the realism layer
 
+## Phase 8 Status: In Progress 🔥
+
+Phase 8 is making the realism layer affect actual audio rendering more deeply and moving closer to natural, expressive, controllable voice behavior.
+
+### Completed in Phase 8 so far
+
+- Audio control map
+- Audio rendering profile
+- Phase 8 plan structure
+- Pipeline integration for audio control planning
+- Audio control tests
+
+### Still remaining in Phase 8
+
+- Apply control map directly in the waveform synthesizer
+- Smooth pitch and energy transitions in audio generation
+- Reduce robotic timing in the actual sound output
+- Add real expressive playback checks
+- Improve speech-musical blending from control values
+
 ## Proposed Package Layout
 
 ```text
@@ -208,6 +228,7 @@ axima_voice/
   phase5.py
   phase6.py
   phase7.py
+  phase8.py
   source.py
   filter.py
   synth.py
@@ -218,7 +239,7 @@ axima_voice/
 
 ## Next Phase Target
 
-Phase 8 will focus on making the realism layer affect actual audio rendering more deeply and moving closer to natural, expressive, controllable voice behavior.
+Phase 8 will continue by pushing the new realism control into actual audio synthesis so the voice sounds more human and less synthetic.
 
 ## Vision
 
