@@ -7,6 +7,11 @@ from typing import Iterable, List, Sequence
 from .performance_graph import PerformanceGraph
 from .phase8 import AudioControlMap, AudioRenderingProfile, Phase8Plan
 from .phase9 import Phase9Plan
+from .runtime_engine import (
+    RuntimeExecutionController,
+    RuntimeState,
+    interleave_runtime_breathing,
+)
 
 
 @dataclass
@@ -20,10 +25,14 @@ class SimpleSynthesizer:
         performance_graph: PerformanceGraph | None = None,
         phase8_plan: Phase8Plan | None = None,
         phase9_plan: Phase9Plan | None = None,
+        runtime_controller: RuntimeExecutionController | None = None,
     ) -> List[float]:
         phoneme_list = list(phonemes)
         if not phoneme_list:
             return [0.0]
+
+        controller = runtime_controller or RuntimeExecutionController()
+        controller.begin_generation()
 
         energy = 1.0
         pitch = 1.0
@@ -57,8 +66,6 @@ class SimpleSynthesizer:
             elif runtime_control.emotion == "soft":
                 energy *= 0.9
                 pitch *= 0.97
-            else:
-                energy *= 1.0
             rendering_profile = phase9_plan.phase8_plan.rendering_profile
 
         base_freq = rendering_profile.base_voice_frequency * pitch
@@ -66,8 +73,18 @@ class SimpleSynthesizer:
         word_count = max(1, len(phoneme_list))
         runtime_pause_map = self._build_runtime_pause_map(phase9_plan, word_count)
         runtime_frame_map = self._build_runtime_frame_map(phase9_plan, word_count)
+        first_audio_emitted = False
 
         for index, token in enumerate(phoneme_list):
+            if controller.interrupted:
+                controller.finish_generation()
+                return interleave_runtime_breathing(samples, sentence_length=word_count, emotion=runtime_control.emotion if runtime_control else "neutral")
+
+            if controller.paused:
+                controller.state = RuntimeState.PAUSED
+                controller.finish_generation()
+                return interleave_runtime_breathing(samples, sentence_length=word_count, emotion=runtime_control.emotion if runtime_control else "neutral")
+
             control = control_map.controls[index] if control_map and index < len(control_map.controls) else None
             token_pitch = pitch_points[index] if index < len(pitch_points) else 1.0
             token_energy = energy_points[index] if index < len(energy_points) else 1.0
@@ -110,6 +127,9 @@ class SimpleSynthesizer:
                 token_runtime_energy *= self._breath_boost(runtime_pause_map, index)
 
             for n in range(count):
+                if controller.interrupted:
+                    controller.finish_generation()
+                    return interleave_runtime_breathing(samples, sentence_length=word_count, emotion=runtime_control.emotion if runtime_control else "neutral")
                 t = n / rendering_profile.sample_rate
                 tone = math.sin(2.0 * math.pi * freq * t)
                 harmonic = rendering_profile.harmonic_depth * math.sin(2.0 * math.pi * (freq * 2.0 * formant_shift) * t)
@@ -118,6 +138,9 @@ class SimpleSynthesizer:
                 envelope = self._envelope(n, count)
                 emphasis = control.emphasis if control else 1.0
                 value = (tone + harmonic + breath) * envelope * 0.18 * energy * token_energy * emphasis * runtime_motion * token_runtime_energy
+                if not first_audio_emitted and abs(value) > 1e-9:
+                    controller.mark_first_audio()
+                    first_audio_emitted = True
                 samples.append(value)
 
             if pause_after is not None:
@@ -127,7 +150,8 @@ class SimpleSynthesizer:
             else:
                 samples.extend(self._silence(0.01))
 
-        return samples
+        controller.finish_generation()
+        return interleave_runtime_breathing(samples, sentence_length=word_count, emotion=runtime_control.emotion if runtime_control else "neutral")
 
     def _build_runtime_pause_map(self, phase9_plan: Phase9Plan | None, word_count: int) -> dict[int, float]:
         if phase9_plan is None:
