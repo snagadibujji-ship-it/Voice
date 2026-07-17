@@ -15,6 +15,7 @@ from .phase8 import build_phase8_plan
 from .phase9 import build_phase9_plan
 from .phonemes import text_to_phonemes
 from .prosody import plan_prosody
+from .runtime_engine import RuntimeExecutionController, RuntimeExecutionResult
 from .simple_synth import SimpleSynthesizer
 from .text_normalizer import normalize_text
 
@@ -41,15 +42,18 @@ class AximaVoice:
         phonemes = text_to_phonemes(normalized, prosody=prosody)
         performance_graph = build_performance_graph(normalized, meaning, prosody)
         streaming_plan = build_streaming_plan(normalized, meaning, performance_plan.to_dict())
-        speech_audio = self.synthesizer.synthesize(
+        runtime_controller = RuntimeExecutionController()
+        speech_result: RuntimeExecutionResult = self.synthesizer.synthesize(
             phonemes,
             performance_graph=performance_graph,
             phase8_plan=phase8_plan,
             phase9_plan=phase9_plan,
+            runtime_controller=runtime_controller,
         )
-        live_playback_plan = build_live_playback_plan(streaming_plan, len(speech_audio), sample_rate=self.synthesizer.sample_rate)
+        live_playback_plan = build_live_playback_plan(streaming_plan, len(speech_result.audio), sample_rate=self.synthesizer.sample_rate)
         music_audio = self.music_renderer.render(composition_plan)
         coarticulated_phonemes = apply_coarticulation(realism_plan.phoneme_words)
+        latency_report = speech_result.metrics.latency_report()
 
         return {
             "text": text,
@@ -65,10 +69,17 @@ class AximaVoice:
             "singing_plan": singing_plan.to_dict(),
             "streaming_plan": streaming_plan.to_dict(),
             "live_playback_plan": live_playback_plan.to_dict(),
+            "runtime_state": speech_result.state.value,
+            "runtime_metrics": speech_result.metrics.to_dict(),
+            "latency_report": latency_report,
+            "interrupted": speech_result.interrupted,
+            "paused": speech_result.paused,
+            "resumed": speech_result.resumed,
+            "stop_reason": speech_result.stop_reason,
             "phonemes": phonemes,
             "coarticulated_phonemes": coarticulated_phonemes,
             "performance_graph": performance_graph.to_dict(),
-            "speech_audio": speech_audio,
+            "speech_audio": speech_result.audio,
             "music_audio": music_audio,
             "personality_memory": self.personality_memory.to_dict(),
         }
