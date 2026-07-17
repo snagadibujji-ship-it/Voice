@@ -42,24 +42,26 @@ Phase 0 delivered the project bootstrap and the first orchestration layer.
 - Streaming audio engine
 - End-to-end audible demo
 
-## Phase 1 Status: In Progress 🔥
+## Phase 1 Status: Closed ✅
 
-Phase 1 is turning the scaffold into real audio output.
+Phase 1 turned the scaffold into a working audio path.
 
-### Completed in Phase 1 so far
+### Completed in Phase 1
 
 - Minimal waveform synthesizer
 - Pipeline wired to audio samples
 - CLI writes real WAV output
 - Audio verification helpers
+- Automated non-silent audio test
+- First audible smoke test scaffold
 
-### Still remaining in Phase 1
+### What Phase 1 still leaves for later phases
 
-- Verify non-silent output in automated tests
-- Add a first audible smoke test
-- Add a tiny demo command and sample output check
-- Improve phoneme timing so it sounds more speech-like
-- Document how to run the first demo
+- More natural phoneme timing
+- Better pronunciation modeling
+- Streaming runtime
+- Emotional performance control
+- Voice identity tuning
 
 ## Proposed Package Layout
 
@@ -83,7 +85,7 @@ axima_voice/
 
 ## Next Phase Target
 
-Phase 1 will be considered complete when Axima can reliably generate a non-silent WAV file from text and the output is verified by tests.
+Phase 2 will make the voice feel more expressive and less synthetic by improving timing, prosody, and performance control.
 
 ## Vision
 
