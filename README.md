@@ -212,27 +212,75 @@ Phase 8 made the realism layer actually affect waveform synthesis.
 - More natural emotional contouring
 - Live expressive playback that reacts in real time
 
-## Phase 9 Status: In Progress 🔥
+## Phase 9 Status: Closed ✅
 
-Phase 9 is turning the expressive layer into a live runtime behavior layer.
+Phase 9 added runtime execution behavior for interruption, pause, resume, and runtime metrics.
 
-### Completed in Phase 9 so far
+### Completed in Phase 9
 
 - Runtime control plan
 - Breath event planning
 - Emotion frames across the sentence
 - Presence cues and hesitation planning
 - Interrupt state and live response bias
-- Pipeline integration for runtime controls
-- Runtime audio control test scaffolding
+- Runtime execution controller
+- Runtime state machine
+- Latency tracking
+- Pipeline exposure of runtime metrics and state
+- Runtime execution tests
 
-### Still remaining in Phase 9
+### What Phase 9 still leaves for later phases
 
-- Verify runtime controls produce stronger audible differences
-- Improve breath-to-pause realism
-- Refine sentence-level emotional motion
-- Add interruption/resume execution behavior
-- Measure expressive latency and runtime response quality
+- True live audio-device interruption
+- Real streaming playback loop
+- External latency measurement from a device/player
+- More natural speech response under interruption
+- Production-grade voice assistant turn-taking
+
+## Phase 10 Planning Report
+
+### Phase 10 Goal
+
+Streaming Voice Engine.
+
+### Architecture
+
+```text
+Text / Response
+  ↓
+Chunk Scheduler
+  ↓
+Streaming Control Plan
+  ↓
+Chunk-by-chunk Synthesis
+  ↓
+Playback Stream
+  ↓
+Interrupt / Resume / Continue
+```
+
+### Technical Risks
+
+- Chunk boundaries can create unnatural joins.
+- Streaming latency may be inconsistent without a true player loop.
+- Interrupt/resume logic can become fragile if state is not preserved per chunk.
+- Audio quality may drop if streaming is rushed before the chunk scheduler is stable.
+
+### Success Criteria
+
+- first audio begins quickly
+- chunks generate in sequence
+- playback can interrupt and resume
+- streaming state is tracked correctly
+- latency metrics are measurable per stream
+
+### Build Plan
+
+1. Add a chunk scheduler that can split a response into runtime-safe audio segments.
+2. Convert the current synthesis result into chunked generation output.
+3. Add a streaming playback controller with pause/resume/interrupt behavior.
+4. Track per-chunk and end-to-end latency.
+5. Add tests for chunk order, interruption, resume, and metrics.
 
 ## Proposed Package Layout
 
@@ -254,6 +302,7 @@ axima_voice/
   phase7.py
   phase8.py
   phase9.py
+  runtime_engine.py
   source.py
   filter.py
   synth.py
@@ -262,15 +311,13 @@ axima_voice/
   wav_io.py
 ```
 
-## Next Phase Target
-
-Phase 9 will keep pushing live expressive runtime behavior so Axima breathes, hesitates, and shifts emotion more naturally during speech.
-
 ## What is real
 
 - speech waveform generation
 - music waveform generation
 - control-aware synthesis
+- runtime execution controller
+- latency tracking
 - phase-to-pipeline integration
 - testable audio output paths
 
@@ -280,6 +327,7 @@ Phase 9 will keep pushing live expressive runtime behavior so Axima breathes, he
 - real interruption behavior in playback
 - full emotional speech naturalness
 - live turn-taking like a product-grade voice assistant
+- device-level streaming playback
 
 ## What remains unsolved
 
@@ -287,6 +335,7 @@ Phase 9 will keep pushing live expressive runtime behavior so Axima breathes, he
 - voice cloning
 - top-tier streaming naturalness
 - singing-grade realism
+- true live playback interruption engine
 
 ## Vision
 
