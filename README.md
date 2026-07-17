@@ -125,6 +125,27 @@ Phase 4 added the live runtime planning layer for voice-mode behavior.
 - More advanced live conversation control
 - Music and singing branch
 
+## Phase 5 Status: Closed ✅
+
+Phase 5 added the music and composition branch.
+
+### Completed in Phase 5
+
+- Music DNA representation
+- Composition plan structure
+- Mood-to-music inference
+- Chord, melody, and rhythm planning
+- Pipeline integration for composition planning
+- Music composition tests
+
+### What Phase 5 still leaves for later phases
+
+- Real music audio rendering
+- Singing voice generation
+- Instrumental track generation
+- Rich harmonic progression control
+- Unified speech-plus-music performance mode
+
 ## Proposed Package Layout
 
 ```text
@@ -140,6 +161,7 @@ axima_voice/
   phase2.py
   phase3.py
   phase4.py
+  phase5.py
   source.py
   filter.py
   synth.py
@@ -150,7 +172,7 @@ axima_voice/
 
 ## Next Phase Target
 
-Phase 5 will focus on making the live runtime truly interactive, with more natural interruption behavior and stronger voice-mode realism.
+Phase 6 will focus on turning composition plans into real music output and exploring singing-style rendering.
 
 ## Vision
 
