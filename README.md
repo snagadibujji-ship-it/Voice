@@ -63,6 +63,27 @@ Phase 1 turned the scaffold into a working audio path.
 - Emotional performance control
 - Voice identity tuning
 
+## Phase 2 Status: Closed ✅
+
+Phase 2 added expressive performance planning and voice identity controls.
+
+### Completed in Phase 2
+
+- Voice DNA representation
+- Performance plan structure
+- Mood inference from text and meaning
+- Expressive speed, pitch, and energy planning
+- Pause and emphasis planning
+- Pipeline integration for performance planning
+
+### What Phase 2 still leaves for later phases
+
+- Better natural-language style control
+- Streaming-first audio chunks
+- Real emotion-conditioned speech rendering
+- More advanced pronunciation and coarticulation
+- Music and singing branch
+
 ## Proposed Package Layout
 
 ```text
@@ -75,6 +96,7 @@ axima_voice/
   prosody.py
   phonemes.py
   performance_graph.py
+  phase2.py
   source.py
   filter.py
   synth.py
@@ -85,7 +107,7 @@ axima_voice/
 
 ## Next Phase Target
 
-Phase 2 will make the voice feel more expressive and less synthetic by improving timing, prosody, and performance control.
+Phase 3 will make Axima feel more alive in real conversation by focusing on streaming, interruption handling, and conversational timing.
 
 ## Vision
 
