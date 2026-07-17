@@ -18,7 +18,7 @@ def main() -> None:
     args = build_parser().parse_args()
     voice = AximaVoice()
     result = voice.synthesize(args.text)
-    audio = [0.0] * max(1, len(result["phonemes"]))
+    audio = result["audio"]
     save_wav(Path(args.out), audio)
     print(result)
 
