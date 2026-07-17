@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
+from .continuity_engine import ContinuityEngine
 from .meaning_parser import parse_meaning
 from .performance_graph import build_performance_graph
 from .phase2 import build_phase2_plan
@@ -14,11 +15,13 @@ from .phase7 import apply_coarticulation, build_realism_plan
 from .phase8 import build_phase8_plan
 from .phase9 import build_phase9_plan
 from .phonemes import text_to_phonemes
+from .playback_engine import PlaybackEngine
 from .prosody import plan_prosody
+from .recovery_state import RecoveryState
 from .runtime_chunks import RuntimeChunkEngine, RuntimeChunkResult
 from .runtime_engine import RuntimeExecutionController, RuntimeExecutionResult
 from .simple_synth import SimpleSynthesizer
-from .state_recovery import RecoveryState, StateRecoveryEngine
+from .state_recovery import StateRecoveryEngine
 from .streaming_metrics import StreamingMetricsEngine
 from .streaming_scheduler import StreamingScheduler
 from .text_normalizer import normalize_text
@@ -35,6 +38,8 @@ class AximaVoice:
     voice_director: VoiceDirector = field(default_factory=VoiceDirector)
     streaming_scheduler: StreamingScheduler = field(init=False)
     runtime_chunk_engine: RuntimeChunkEngine = field(init=False)
+    playback_engine: PlaybackEngine = field(default_factory=PlaybackEngine)
+    continuity_engine: ContinuityEngine = field(default_factory=ContinuityEngine)
     recovery_engine: StateRecoveryEngine = field(default_factory=StateRecoveryEngine)
     metrics_engine: StreamingMetricsEngine = field(default_factory=StreamingMetricsEngine)
 
@@ -79,6 +84,7 @@ class AximaVoice:
         chunk_results: List[Dict[str, Any]] = []
         running_audio: List[float] = []
         chunk_controller = RuntimeExecutionController()
+        continuity_state = self.continuity_engine.next_state(phase9_plan.runtime_control.emotion)
         for chunk in schedule.chunks:
             chunk_result: RuntimeChunkResult = self.runtime_chunk_engine.render_chunk(
                 chunk,
@@ -89,18 +95,27 @@ class AximaVoice:
                 phonemes=phonemes,
                 performance_graph=performance_graph,
             )
-            running_audio = chunk_result.audio
-            chunk_results.append(chunk_result.to_dict())
+            blended_audio = self.continuity_engine.blend_chunk_audio(chunk_result.audio, continuity_state, phase9_plan.runtime_control.emotion)
+            running_audio = blended_audio
+            chunk_results.append({**chunk_result.to_dict(), "audio": blended_audio})
+            continuity_state = self.continuity_engine.next_state(
+                phase9_plan.runtime_control.emotion,
+                energy=1.0,
+                pitch=1.0,
+                pause=schedule.target_chunk_latency_ms / 1000.0,
+            )
             recovery_state = RecoveryState(
                 chunk_index=chunk.index,
-                sentence_index=0,
-                phoneme_index=len(phonemes),
+                sample_position=len(blended_audio),
+                phoneme_position=len(phonemes),
                 emotion_state=phase9_plan.runtime_control.emotion,
                 playback_state=chunk_result.state,
                 runtime_state=chunk_result.state,
             )
             saved_state = self.recovery_engine.save_state(recovery_state)
-            _ = self.recovery_engine.restore_state(saved_state)
+            _ = self.recovery_engine.recover_exact_position(saved_state)
+
+        playback_result = self.playback_engine.play(chunk_results=[RuntimeChunkResult(**{k: v for k, v in chunk.items() if k in {"chunk_index", "text", "audio", "state", "metrics", "interrupted", "resumed"}}) for chunk in chunk_results], predictive_opening=[0.0])
 
         return {
             "text": text,
@@ -117,14 +132,17 @@ class AximaVoice:
             "streaming_plan": streaming_plan.to_dict(),
             "stream_schedule": schedule.to_dict(),
             "runtime_chunks": chunk_results,
+            "playback_state": playback_result.state.value,
+            "playback_metrics": playback_result.metrics.to_dict(),
+            "playback_audio": playback_result.audio,
             "live_playback_plan": live_playback_plan.to_dict(),
             "runtime_state": speech_result.state.value,
             "runtime_metrics": speech_result.metrics.to_dict(),
             "latency_report": latency_report,
             "streaming_metrics": metrics.to_dict(),
-            "interrupted": speech_result.interrupted,
-            "paused": speech_result.paused,
-            "resumed": speech_result.resumed,
+            "interrupted": speech_result.interrupted or playback_result.interrupted,
+            "paused": speech_result.paused or playback_result.paused,
+            "resumed": speech_result.resumed or playback_result.resumed,
             "stop_reason": speech_result.stop_reason,
             "phonemes": phonemes,
             "coarticulated_phonemes": coarticulated_phonemes,
