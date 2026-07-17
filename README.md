@@ -212,6 +212,28 @@ Phase 8 made the realism layer actually affect waveform synthesis.
 - More natural emotional contouring
 - Live expressive playback that reacts in real time
 
+## Phase 9 Status: In Progress 🔥
+
+Phase 9 is turning the expressive layer into a live runtime behavior layer.
+
+### Completed in Phase 9 so far
+
+- Runtime control plan
+- Breath event planning
+- Emotion frames across the sentence
+- Presence cues and hesitation planning
+- Interrupt state and live response bias
+- Pipeline integration for runtime controls
+- Runtime audio control test scaffolding
+
+### Still remaining in Phase 9
+
+- Verify runtime controls produce stronger audible differences
+- Improve breath-to-pause realism
+- Refine sentence-level emotional motion
+- Add interruption/resume execution behavior
+- Measure expressive latency and runtime response quality
+
 ## Proposed Package Layout
 
 ```text
@@ -231,6 +253,7 @@ axima_voice/
   phase6.py
   phase7.py
   phase8.py
+  phase9.py
   source.py
   filter.py
   synth.py
@@ -241,7 +264,29 @@ axima_voice/
 
 ## Next Phase Target
 
-Phase 9 will focus on live expressiveness: smoother transitions, stronger runtime emotion shaping, and richer real-time control over speech behavior.
+Phase 9 will keep pushing live expressive runtime behavior so Axima breathes, hesitates, and shifts emotion more naturally during speech.
+
+## What is real
+
+- speech waveform generation
+- music waveform generation
+- control-aware synthesis
+- phase-to-pipeline integration
+- testable audio output paths
+
+## What is simulated
+
+- true human breathing
+- real interruption behavior in playback
+- full emotional speech naturalness
+- live turn-taking like a product-grade voice assistant
+
+## What remains unsolved
+
+- very high quality prosody
+- voice cloning
+- top-tier streaming naturalness
+- singing-grade realism
 
 ## Vision
 
