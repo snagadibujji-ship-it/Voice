@@ -39,20 +39,42 @@ class CompositionPlan:
         }
 
 
-def infer_music_dna(text: str, meaning: Dict[str, Any], performance_plan: Dict[str, Any]) -> MusicDNA:
+def infer_music_dna(
+    text: str, meaning: Dict[str, Any], performance_plan: Dict[str, Any]
+) -> MusicDNA:
     mood = performance_plan.get("mood", meaning.get("mood", "neutral"))
     if mood == "excited":
-        return MusicDNA(mood=mood, tempo=148, key="D", scale="minor", intensity=0.85, brightness=0.72)
+        return MusicDNA(
+            mood=mood,
+            tempo=148,
+            key="D",
+            scale="minor",
+            intensity=0.85,
+            brightness=0.72,
+        )
     if mood == "soft":
-        return MusicDNA(mood=mood, tempo=84, key="A", scale="minor", intensity=0.35, brightness=0.32)
+        return MusicDNA(
+            mood=mood, tempo=84, key="A", scale="minor", intensity=0.35, brightness=0.32
+        )
     if mood == "urgent":
-        return MusicDNA(mood=mood, tempo=136, key="E", scale="minor", intensity=0.78, brightness=0.68)
+        return MusicDNA(
+            mood=mood,
+            tempo=136,
+            key="E",
+            scale="minor",
+            intensity=0.78,
+            brightness=0.68,
+        )
     if "music" in text.lower() or meaning.get("intent") == "music":
-        return MusicDNA(mood=mood, tempo=128, key="F", scale="major", intensity=0.65, brightness=0.6)
+        return MusicDNA(
+            mood=mood, tempo=128, key="F", scale="major", intensity=0.65, brightness=0.6
+        )
     return MusicDNA(mood=mood)
 
 
-def build_composition_plan(text: str, meaning: Dict[str, Any], performance_plan: Dict[str, Any]) -> CompositionPlan:
+def build_composition_plan(
+    text: str, meaning: Dict[str, Any], performance_plan: Dict[str, Any]
+) -> CompositionPlan:
     music_dna = infer_music_dna(text, meaning, performance_plan)
     words = [w for w in text.split() if w]
 
@@ -67,7 +89,9 @@ def build_composition_plan(text: str, meaning: Dict[str, Any], performance_plan:
     bar_count = max(2, min(8, len(words) // 2 + 1))
     for index in range(bar_count):
         chord = chords[index % len(chords)]
-        melody_hint = f"rise-{index % 3}" if music_dna.intensity > 0.6 else f"step-{index % 2}"
+        melody_hint = (
+            f"rise-{index % 3}" if music_dna.intensity > 0.6 else f"step-{index % 2}"
+        )
         rhythm_hint = "driving" if music_dna.tempo >= 130 else "gentle"
         bars.append(
             CompositionBar(

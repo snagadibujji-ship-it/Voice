@@ -157,8 +157,10 @@ def g2p(text: str, dictionary: Dict[str, List[str]] | None = None) -> List[Phone
                 word=word,
                 phonemes=phonemes,
                 stress_index=0 if len(phonemes) <= 2 else min(1, len(phonemes) - 1),
-                linked_from_previous=index > 0 and key in {"to", "of", "and", "with", "the"},
-                linked_to_next=index < len(raw_words) - 1 and key in {"to", "of", "and", "with", "the"},
+                linked_from_previous=index > 0
+                and key in {"to", "of", "and", "with", "the"},
+                linked_to_next=index < len(raw_words) - 1
+                and key in {"to", "of", "and", "with", "the"},
             )
         )
     return words
@@ -166,7 +168,10 @@ def g2p(text: str, dictionary: Dict[str, List[str]] | None = None) -> List[Phone
 
 def detect_emotion(text: str, meaning: Dict[str, Any]) -> str:
     lowered = text.lower()
-    if any(token in lowered for token in ["!", "amazing", "epic", "wow", "great", "awesome"]):
+    if any(
+        token in lowered
+        for token in ["!", "amazing", "epic", "wow", "great", "awesome"]
+    ):
         return "excited"
     if any(token in lowered for token in ["sorry", "sad", "unfortunately", "missed"]):
         return "soft"
@@ -179,15 +184,48 @@ def detect_emotion(text: str, meaning: Dict[str, Any]) -> str:
 
 def render_emotion(emotion: str) -> EmotionRenderPlan:
     if emotion == "excited":
-        return EmotionRenderPlan(emotion, pitch_scale=1.12, energy_scale=1.16, duration_scale=0.94, pause_scale=0.85, emphasis_words=["amazing", "epic", "wow"])
+        return EmotionRenderPlan(
+            emotion,
+            pitch_scale=1.12,
+            energy_scale=1.16,
+            duration_scale=0.94,
+            pause_scale=0.85,
+            emphasis_words=["amazing", "epic", "wow"],
+        )
     if emotion == "soft":
-        return EmotionRenderPlan(emotion, pitch_scale=0.96, energy_scale=0.86, duration_scale=1.12, pause_scale=1.18, emphasis_words=[])
+        return EmotionRenderPlan(
+            emotion,
+            pitch_scale=0.96,
+            energy_scale=0.86,
+            duration_scale=1.12,
+            pause_scale=1.18,
+            emphasis_words=[],
+        )
     if emotion == "urgent":
-        return EmotionRenderPlan(emotion, pitch_scale=1.03, energy_scale=1.2, duration_scale=0.9, pause_scale=0.8, emphasis_words=["now", "quick"])
-    return EmotionRenderPlan(emotion, pitch_scale=1.0, energy_scale=1.0, duration_scale=1.0, pause_scale=1.0, emphasis_words=[])
+        return EmotionRenderPlan(
+            emotion,
+            pitch_scale=1.03,
+            energy_scale=1.2,
+            duration_scale=0.9,
+            pause_scale=0.8,
+            emphasis_words=["now", "quick"],
+        )
+    return EmotionRenderPlan(
+        emotion,
+        pitch_scale=1.0,
+        energy_scale=1.0,
+        duration_scale=1.0,
+        pause_scale=1.0,
+        emphasis_words=[],
+    )
 
 
-def build_prosody_curve(text: str, phoneme_words: List[PhonemeWord], emotion_plan: EmotionRenderPlan, voice_identity: VoiceIdentity) -> ProsodyCurve:
+def build_prosody_curve(
+    text: str,
+    phoneme_words: List[PhonemeWord],
+    emotion_plan: EmotionRenderPlan,
+    voice_identity: VoiceIdentity,
+) -> ProsodyCurve:
     pitch_points: List[float] = []
     energy_points: List[float] = []
     duration_points: List[float] = []
@@ -195,12 +233,33 @@ def build_prosody_curve(text: str, phoneme_words: List[PhonemeWord], emotion_pla
     words = [w.strip(".,!?;:\"'()[]{}") for w in text.split() if w.strip()]
     for index, word in enumerate(words):
         emphasis = 1.08 if word.lower() in emotion_plan.emphasis_words else 1.0
-        token_count = max(1, len(phoneme_words[index].phonemes) if index < len(phoneme_words) else 1)
-        pitch_points.append((1.0 + (index % 3) * 0.02) * emotion_plan.pitch_scale * (1.0 + voice_identity.futuristic_edge * 0.02) * emphasis)
-        energy_points.append((0.9 + (index % 2) * 0.05) * emotion_plan.energy_scale * (1.0 + voice_identity.confidence * 0.01) * emphasis)
-        duration_points.append(max(0.08, 0.11 * emotion_plan.duration_scale + token_count * 0.002))
-        pause_points.append(0.02 * emotion_plan.pause_scale if index < len(words) - 1 else 0.0)
-    return ProsodyCurve(pitch_points=pitch_points, energy_points=energy_points, duration_points=duration_points, pause_points=pause_points)
+        token_count = max(
+            1, len(phoneme_words[index].phonemes) if index < len(phoneme_words) else 1
+        )
+        pitch_points.append(
+            (1.0 + (index % 3) * 0.02)
+            * emotion_plan.pitch_scale
+            * (1.0 + voice_identity.futuristic_edge * 0.02)
+            * emphasis
+        )
+        energy_points.append(
+            (0.9 + (index % 2) * 0.05)
+            * emotion_plan.energy_scale
+            * (1.0 + voice_identity.confidence * 0.01)
+            * emphasis
+        )
+        duration_points.append(
+            max(0.08, 0.11 * emotion_plan.duration_scale + token_count * 0.002)
+        )
+        pause_points.append(
+            0.02 * emotion_plan.pause_scale if index < len(words) - 1 else 0.0
+        )
+    return ProsodyCurve(
+        pitch_points=pitch_points,
+        energy_points=energy_points,
+        duration_points=duration_points,
+        pause_points=pause_points,
+    )
 
 
 def apply_coarticulation(phoneme_words: List[PhonemeWord]) -> List[str]:
@@ -212,7 +271,12 @@ def apply_coarticulation(phoneme_words: List[PhonemeWord]) -> List[str]:
                 output.append("_")
         for phoneme in word.phonemes:
             output.append(phoneme)
-        if index < len(phoneme_words) - 1 and word.word.lower() in {"to", "and", "with", "the"}:
+        if index < len(phoneme_words) - 1 and word.word.lower() in {
+            "to",
+            "and",
+            "with",
+            "the",
+        }:
             output.append("~")
     return output
 
@@ -224,7 +288,11 @@ def build_realism_plan(text: str, meaning: Dict[str, Any]) -> RealismPlan:
     emotion = detect_emotion(text, meaning)
     emotion_plan = render_emotion(emotion)
     prosody_curve = build_prosody_curve(text, phoneme_words, emotion_plan, identity)
-    coarticulation_notes = ["blend_function_words", "light_release_consonants", "avoid_flat_pitch"]
+    coarticulation_notes = [
+        "blend_function_words",
+        "light_release_consonants",
+        "avoid_flat_pitch",
+    ]
     return RealismPlan(
         identity=identity,
         phoneme_words=phoneme_words,

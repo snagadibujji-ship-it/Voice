@@ -4,11 +4,13 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List
 
 from .phase9 import Phase9Plan
+from .emotion_engine import EmotionProfile
 from .phase8 import Phase8Plan
 from .runtime_engine import RuntimeExecutionController, RuntimeExecutionResult
 from .simple_synth import SimpleSynthesizer
-from .streaming_scheduler import StreamingSchedule, StreamingChunkPlan
+from .streaming_scheduler import StreamingChunkPlan
 from .voice_director import VoiceDirector
+from .voice_identity import VoiceProfile
 
 
 @dataclass
@@ -48,6 +50,9 @@ class RuntimeChunkEngine:
         prior_audio: List[float] | None = None,
         phonemes: List[str] | None = None,
         performance_graph: Any | None = None,
+        voice_profile: VoiceProfile | None = None,
+        emotion_profile: EmotionProfile | None = None,
+        vocal_events: dict[str, int] | None = None,
     ) -> RuntimeChunkResult:
         runtime_controller = controller or RuntimeExecutionController()
         if resume_from_state is not None:
@@ -64,8 +69,11 @@ class RuntimeChunkEngine:
             phase8_plan=phase8_plan,
             phase9_plan=phase9_plan,
             runtime_controller=runtime_controller,
+            voice_profile=voice_profile,
+            emotion_profile=emotion_profile,
+            vocal_events=vocal_events,
         )
-        audio = (prior_audio or []) + result.audio
+        audio = result.audio
         return RuntimeChunkResult(
             chunk_index=chunk.index,
             text=chunk.text,

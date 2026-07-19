@@ -8,6 +8,9 @@ from typing import Any, Dict, List, Optional
 class StreamingMetrics:
     first_audio_latency_ms: Optional[float] = None
     chunk_latency_ms: List[float] = field(default_factory=list)
+    chunk_generation_latency_ms: List[float] = field(default_factory=list)
+    chunk_playback_latency_ms: List[float] = field(default_factory=list)
+    stream_duration_ms: Optional[float] = None
     interrupt_latency_ms: Optional[float] = None
     resume_latency_ms: Optional[float] = None
     total_generation_ms: Optional[float] = None
@@ -18,9 +21,12 @@ class StreamingMetrics:
         return {
             "first_audio_latency_ms": self.first_audio_latency_ms,
             "chunk_latency_ms": self.chunk_latency_ms,
+            "chunk_generation_latency_ms": self.chunk_generation_latency_ms,
+            "chunk_playback_latency_ms": self.chunk_playback_latency_ms,
             "interrupt_latency_ms": self.interrupt_latency_ms,
             "resume_latency_ms": self.resume_latency_ms,
             "total_generation_ms": self.total_generation_ms,
+            "stream_duration_ms": self.stream_duration_ms,
             "chunks_generated": self.chunks_generated,
             "chunks_completed": self.chunks_completed,
         }

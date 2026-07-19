@@ -46,7 +46,9 @@ def infer_mood(text: str, meaning: Dict[str, Any]) -> str:
     return meaning.get("mood", "neutral")
 
 
-def build_phase2_plan(text: str, meaning: Dict[str, Any], prosody: Dict[str, Any]) -> PerformancePlan:
+def build_phase2_plan(
+    text: str, meaning: Dict[str, Any], prosody: Dict[str, Any]
+) -> PerformancePlan:
     mood = infer_mood(text, meaning)
     base_speed = float(prosody.get("speed", 1.0))
     base_pitch = float(prosody.get("pitch", 1.0))
@@ -60,7 +62,9 @@ def build_phase2_plan(text: str, meaning: Dict[str, Any], prosody: Dict[str, Any
             energy_multiplier=base_energy * 1.15,
             pauses=[0.015, 0.02],
             emphasis_tokens=[text.split(" ")[0]] if text.split(" ") else [],
-            voice_dna=VoiceDNA(warmth=0.75, curiosity=0.7, confidence=0.85, energy=0.85, humor=0.25),
+            voice_dna=VoiceDNA(
+                warmth=0.75, curiosity=0.7, confidence=0.85, energy=0.85, humor=0.25
+            ),
         )
 
     if mood == "soft":
@@ -71,7 +75,9 @@ def build_phase2_plan(text: str, meaning: Dict[str, Any], prosody: Dict[str, Any
             energy_multiplier=base_energy * 0.88,
             pauses=[0.03, 0.04],
             emphasis_tokens=[],
-            voice_dna=VoiceDNA(warmth=0.9, curiosity=0.45, confidence=0.55, energy=0.45, humor=0.1),
+            voice_dna=VoiceDNA(
+                warmth=0.9, curiosity=0.45, confidence=0.55, energy=0.45, humor=0.1
+            ),
         )
 
     if mood == "urgent":
@@ -82,7 +88,9 @@ def build_phase2_plan(text: str, meaning: Dict[str, Any], prosody: Dict[str, Any
             energy_multiplier=base_energy * 1.2,
             pauses=[0.01],
             emphasis_tokens=["now"],
-            voice_dna=VoiceDNA(warmth=0.55, curiosity=0.4, confidence=0.95, energy=0.9, humor=0.05),
+            voice_dna=VoiceDNA(
+                warmth=0.55, curiosity=0.4, confidence=0.95, energy=0.9, humor=0.05
+            ),
         )
 
     return PerformancePlan(

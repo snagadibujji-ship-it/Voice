@@ -47,14 +47,25 @@ class StreamingScheduler:
         tone = self.director.tone_for_text(text)
         words = [w.strip(".,!?;:\"'()[]{}") for w in text.split() if w.strip()]
         if not words:
-            return StreamingSchedule(chunks=[StreamingChunkPlan(index=0, text="", priority=0, estimated_tokens=1, latency_budget_ms=100, interrupt_priority=0)])
+            return StreamingSchedule(
+                chunks=[
+                    StreamingChunkPlan(
+                        index=0,
+                        text="",
+                        priority=0,
+                        estimated_tokens=1,
+                        latency_budget_ms=100,
+                        interrupt_priority=0,
+                    )
+                ]
+            )
 
         chunks: List[StreamingChunkPlan] = []
         cursor = 0
         while cursor < len(words):
             remaining = len(words) - cursor
             chunk_size = 2 if remaining >= 6 else 1 if remaining <= 2 else 2
-            chunk_words = words[cursor:cursor + chunk_size]
+            chunk_words = words[cursor : cursor + chunk_size]
             chunk_text = " ".join(chunk_words)
             priority = 2 if cursor == 0 else 1
             if tone["urgency"] > 0.75:
@@ -77,4 +88,9 @@ class StreamingScheduler:
         target_chunk_latency_ms = 100 if tone["urgency"] > 0.75 else 120
         playback_priority = 2 if tone["excitement"] > 0.8 else 1
         chunks.sort(key=lambda c: (-c.priority, c.index))
-        return StreamingSchedule(chunks=chunks, target_first_audio_ms=target_first_audio_ms, target_chunk_latency_ms=target_chunk_latency_ms, playback_priority=playback_priority)
+        return StreamingSchedule(
+            chunks=chunks,
+            target_first_audio_ms=target_first_audio_ms,
+            target_chunk_latency_ms=target_chunk_latency_ms,
+            playback_priority=playback_priority,
+        )

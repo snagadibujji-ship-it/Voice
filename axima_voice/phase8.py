@@ -80,11 +80,31 @@ def build_audio_control_map(realism_plan: RealismPlan) -> AudioControlMap:
     emotion = realism_plan.emotion_plan.emotion
     controls: List[AudioControlPoint] = []
     for index, word in enumerate(phoneme_words):
-        emphasis = 1.08 if word.word.lower() in realism_plan.emotion_plan.emphasis_words else 1.0
-        pitch_scale = realism_plan.prosody_curve.pitch_points[index] if index < len(realism_plan.prosody_curve.pitch_points) else 1.0
-        energy_scale = realism_plan.prosody_curve.energy_points[index] if index < len(realism_plan.prosody_curve.energy_points) else 1.0
-        duration_scale = realism_plan.prosody_curve.duration_points[index] if index < len(realism_plan.prosody_curve.duration_points) else 0.11
-        pause_after = realism_plan.prosody_curve.pause_points[index] if index < len(realism_plan.prosody_curve.pause_points) else 0.0
+        emphasis = (
+            1.08
+            if word.word.lower() in realism_plan.emotion_plan.emphasis_words
+            else 1.0
+        )
+        pitch_scale = (
+            realism_plan.prosody_curve.pitch_points[index]
+            if index < len(realism_plan.prosody_curve.pitch_points)
+            else 1.0
+        )
+        energy_scale = (
+            realism_plan.prosody_curve.energy_points[index]
+            if index < len(realism_plan.prosody_curve.energy_points)
+            else 1.0
+        )
+        duration_scale = (
+            realism_plan.prosody_curve.duration_points[index]
+            if index < len(realism_plan.prosody_curve.duration_points)
+            else 0.11
+        )
+        pause_after = (
+            realism_plan.prosody_curve.pause_points[index]
+            if index < len(realism_plan.prosody_curve.pause_points)
+            else 0.0
+        )
         controls.append(
             AudioControlPoint(
                 index=index,
@@ -105,7 +125,9 @@ def build_audio_control_map(realism_plan: RealismPlan) -> AudioControlMap:
     )
 
 
-def build_rendering_profile(realism_plan: RealismPlan, control_map: AudioControlMap) -> AudioRenderingProfile:
+def build_rendering_profile(
+    realism_plan: RealismPlan, control_map: AudioControlMap
+) -> AudioRenderingProfile:
     if control_map.emotion == "excited":
         return AudioRenderingProfile(
             sample_rate=22050,

@@ -10,5 +10,10 @@ def test_phase7_realism_plan_and_coarticulation():
     assert realism_plan["identity"]["name"] == "Axima"
     assert len(realism_plan["phoneme_words"]) >= 1
     assert len(realism_plan["prosody_curve"]["pitch_points"]) >= 1
-    assert realism_plan["emotion_plan"]["emotion"] in {"neutral", "excited", "soft", "urgent"}
+    assert realism_plan["emotion_plan"]["emotion"] in {
+        "neutral",
+        "excited",
+        "soft",
+        "urgent",
+    }
     assert len(result["coarticulated_phonemes"]) >= len(result["phonemes"])

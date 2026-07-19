@@ -4,7 +4,9 @@ from axima_voice.runtime_engine import RuntimeExecutionController, RuntimeState
 
 def test_phase9_runtime_metrics_and_state():
     voice = AximaVoice()
-    result = voice.synthesize("Hello Gowtham, because we are going live now and this should feel alive")
+    result = voice.synthesize(
+        "Hello Gowtham, because we are going live now and this should feel alive"
+    )
 
     assert result["runtime_state"] in {"FINISHED", "INTERRUPTED", "PAUSED", "RESUMING"}
     assert result["latency_report"]["first_audio_latency_ms"] is not None

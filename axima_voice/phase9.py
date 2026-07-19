@@ -107,7 +107,10 @@ class Phase9Plan:
 
 def _emotion_from_text(text: str, realism_plan: RealismPlan) -> str:
     lowered = text.lower()
-    if any(token in lowered for token in ["!", "great", "awesome", "epic", "amazing", "now"]):
+    if any(
+        token in lowered
+        for token in ["!", "great", "awesome", "epic", "amazing", "now"]
+    ):
         return "excited"
     if any(token in lowered for token in ["sorry", "sad", "unfortunately", "missed"]):
         return "soft"
@@ -116,7 +119,9 @@ def _emotion_from_text(text: str, realism_plan: RealismPlan) -> str:
     return realism_plan.emotion_plan.emotion
 
 
-def build_breath_events(text: str, runtime_profile: RuntimeProfile) -> List[BreathEvent]:
+def build_breath_events(
+    text: str, runtime_profile: RuntimeProfile
+) -> List[BreathEvent]:
     words = [w.strip(".,!?;:\"'()[]{}") for w in text.split() if w.strip()]
     events: List[BreathEvent] = []
     for index, word in enumerate(words):
@@ -134,7 +139,9 @@ def build_breath_events(text: str, runtime_profile: RuntimeProfile) -> List[Brea
     return events
 
 
-def build_emotion_frames(text: str, emotion: str, control_map_controls: List[Dict[str, Any]]) -> List[EmotionFrame]:
+def build_emotion_frames(
+    text: str, emotion: str, control_map_controls: List[Dict[str, Any]]
+) -> List[EmotionFrame]:
     words = [w.strip(".,!?;:\"'()[]{}") for w in text.split() if w.strip()]
     frames: List[EmotionFrame] = []
     total = max(1, len(words))
@@ -180,20 +187,34 @@ def build_emotion_frames(text: str, emotion: str, control_map_controls: List[Dic
     return frames
 
 
-def build_presence_cues(text: str, emotion: str, runtime_profile: RuntimeProfile) -> List[PresenceCue]:
+def build_presence_cues(
+    text: str, emotion: str, runtime_profile: RuntimeProfile
+) -> List[PresenceCue]:
     words = [w.strip(".,!?;:\"'()[]{}") for w in text.split() if w.strip()]
     cues: List[PresenceCue] = []
     for index, word in enumerate(words):
         if index == 0 and len(words) > 2:
-            cues.append(PresenceCue(index=index, cue_type="thinking_start", duration_seconds=runtime_profile.micro_pause_ms / 1000.0))
+            cues.append(
+                PresenceCue(
+                    index=index,
+                    cue_type="thinking_start",
+                    duration_seconds=runtime_profile.micro_pause_ms / 1000.0,
+                )
+            )
         if word.lower() in {"hmm", "well", "let", "think"}:
-            cues.append(PresenceCue(index=index, cue_type="hesitation", duration_seconds=0.08))
+            cues.append(
+                PresenceCue(index=index, cue_type="hesitation", duration_seconds=0.08)
+            )
         if emotion in {"excited", "urgent"} and index == len(words) - 2:
-            cues.append(PresenceCue(index=index, cue_type="anticipation", duration_seconds=0.05))
+            cues.append(
+                PresenceCue(index=index, cue_type="anticipation", duration_seconds=0.05)
+            )
     return cues
 
 
-def build_runtime_control_plan(text: str, phase8_plan: Phase8Plan, realism_plan: RealismPlan) -> RuntimeControlPlan:
+def build_runtime_control_plan(
+    text: str, phase8_plan: Phase8Plan, realism_plan: RealismPlan
+) -> RuntimeControlPlan:
     emotion = _emotion_from_text(text, realism_plan)
     runtime_profile = RuntimeProfile()
     breath_events = build_breath_events(text, runtime_profile)
@@ -212,7 +233,9 @@ def build_runtime_control_plan(text: str, phase8_plan: Phase8Plan, realism_plan:
     )
 
 
-def build_phase9_plan(text: str, phase8_plan: Phase8Plan, realism_plan: RealismPlan) -> Phase9Plan:
+def build_phase9_plan(
+    text: str, phase8_plan: Phase8Plan, realism_plan: RealismPlan
+) -> Phase9Plan:
     runtime_profile = RuntimeProfile()
     runtime_control = build_runtime_control_plan(text, phase8_plan, realism_plan)
     runtime_notes = [

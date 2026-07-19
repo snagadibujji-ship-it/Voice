@@ -15,16 +15,22 @@ class MusicRenderer:
     def render(self, composition_plan: CompositionPlan) -> List[float]:
         audio: List[float] = []
         for bar in composition_plan.bars:
-            chord_base = self._chord_base_frequency(bar.chord, composition_plan.music_dna.key)
+            chord_base = self._chord_base_frequency(
+                bar.chord, composition_plan.music_dna.key
+            )
             bar_samples = int(self.sample_rate * self.beat_seconds * bar.duration_beats)
             for n in range(bar_samples):
                 t = n / self.sample_rate
                 carrier = math.sin(2.0 * math.pi * chord_base * t)
                 harmonic = 0.35 * math.sin(2.0 * math.pi * (chord_base * 2.0) * t)
-                rhythm = 0.12 * math.sin(2.0 * math.pi * (composition_plan.music_dna.tempo / 60.0) * t)
+                rhythm = 0.12 * math.sin(
+                    2.0 * math.pi * (composition_plan.music_dna.tempo / 60.0) * t
+                )
                 envelope = self._envelope(n, bar_samples)
                 intensity = composition_plan.music_dna.intensity
-                audio.append((carrier + harmonic + rhythm) * envelope * 0.16 * intensity)
+                audio.append(
+                    (carrier + harmonic + rhythm) * envelope * 0.16 * intensity
+                )
             audio.extend([0.0] * int(self.sample_rate * 0.03))
         return audio
 
@@ -97,12 +103,16 @@ class FusionPlan:
         }
 
 
-def build_fusion_plan(speech_text: str, composition_plan: CompositionPlan) -> FusionPlan:
+def build_fusion_plan(
+    speech_text: str, composition_plan: CompositionPlan
+) -> FusionPlan:
     mood = composition_plan.music_dna.mood
     return FusionPlan(
         speech_text=speech_text,
         music_audio_hint=f"soft-{mood}-pad",
-        overlay_mode="speech_with_soft_music" if composition_plan.can_instrumentalize else "speech_only",
+        overlay_mode="speech_with_soft_music"
+        if composition_plan.can_instrumentalize
+        else "speech_only",
     )
 
 
