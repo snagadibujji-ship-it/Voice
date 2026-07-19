@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, List
 
 
 @dataclass
@@ -57,7 +57,9 @@ def split_for_streaming(text: str) -> List[str]:
     return parts
 
 
-def build_streaming_plan(text: str, meaning: Dict[str, Any], performance_plan: Dict[str, Any]) -> StreamingPlan:
+def build_streaming_plan(
+    text: str, meaning: Dict[str, Any], performance_plan: Dict[str, Any]
+) -> StreamingPlan:
     parts = split_for_streaming(text)
     mood = performance_plan.get("mood", meaning.get("mood", "neutral"))
     state = ConversationState(
@@ -72,6 +74,10 @@ def build_streaming_plan(text: str, meaning: Dict[str, Any], performance_plan: D
     for index, part in enumerate(parts):
         audio_hint = f"chunk-{index + 1}:{mood}"
         pause_after = 0.02 if index < len(parts) - 1 else 0.0
-        chunks.append(StreamChunk(index=index, text=part, audio_hint=audio_hint, pause_after=pause_after))
+        chunks.append(
+            StreamChunk(
+                index=index, text=part, audio_hint=audio_hint, pause_after=pause_after
+            )
+        )
 
     return StreamingPlan(state=state, chunks=chunks)

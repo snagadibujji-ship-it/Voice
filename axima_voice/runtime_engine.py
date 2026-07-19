@@ -21,8 +21,26 @@ class RuntimeMetrics:
     first_audio_time_ms: Optional[float] = None
     completion_time_ms: Optional[float] = None
 
+    def latency_report(self) -> Dict[str, Optional[float]]:
+        first_audio_latency_ms = None
+        total_generation_ms = None
+        if (
+            self.generation_start_ms is not None
+            and self.first_audio_time_ms is not None
+        ):
+            first_audio_latency_ms = self.first_audio_time_ms - self.generation_start_ms
+        if self.generation_start_ms is not None and self.completion_time_ms is not None:
+            total_generation_ms = self.completion_time_ms - self.generation_start_ms
+        return {
+            "generation_start_ms": self.generation_start_ms,
+            "first_audio_time_ms": self.first_audio_time_ms,
+            "completion_time_ms": self.completion_time_ms,
+            "first_audio_latency_ms": first_audio_latency_ms,
+            "total_generation_ms": total_generation_ms,
+        }
+
     def to_dict(self) -> Dict[str, Any]:
-        return self.__dict__.copy()
+        return {**self.__dict__.copy(), **self.latency_report()}
 
 
 @dataclass
@@ -88,10 +106,20 @@ class RuntimeExecutionController:
     def latency_report(self) -> Dict[str, Optional[float]]:
         first_audio_latency_ms = None
         total_generation_ms = None
-        if self.metrics.generation_start_ms is not None and self.metrics.first_audio_time_ms is not None:
-            first_audio_latency_ms = self.metrics.first_audio_time_ms - self.metrics.generation_start_ms
-        if self.metrics.generation_start_ms is not None and self.metrics.completion_time_ms is not None:
-            total_generation_ms = self.metrics.completion_time_ms - self.metrics.generation_start_ms
+        if (
+            self.metrics.generation_start_ms is not None
+            and self.metrics.first_audio_time_ms is not None
+        ):
+            first_audio_latency_ms = (
+                self.metrics.first_audio_time_ms - self.metrics.generation_start_ms
+            )
+        if (
+            self.metrics.generation_start_ms is not None
+            and self.metrics.completion_time_ms is not None
+        ):
+            total_generation_ms = (
+                self.metrics.completion_time_ms - self.metrics.generation_start_ms
+            )
         return {
             "generation_start_ms": self.metrics.generation_start_ms,
             "first_audio_time_ms": self.metrics.first_audio_time_ms,
@@ -101,7 +129,9 @@ class RuntimeExecutionController:
         }
 
 
-def interleave_runtime_breathing(audio: Iterable[float], sentence_length: int, emotion: str) -> List[float]:
+def interleave_runtime_breathing(
+    audio: Iterable[float], sentence_length: int, emotion: str
+) -> List[float]:
     samples = list(audio)
     if not samples:
         return [0.0]
@@ -126,4 +156,9 @@ def interleave_runtime_breathing(audio: Iterable[float], sentence_length: int, e
 
     # Insert a mid-point micro-breath and a tail breath so the behavior changes audibly.
     mid = max(1, len(samples) // 2)
-    return samples[:mid] + ([0.0] * pause_samples) + samples[mid:] + ([0.0] * max(1, pause_samples // 2))
+    return (
+        samples[:mid]
+        + ([0.0] * pause_samples)
+        + samples[mid:]
+        + ([0.0] * max(1, pause_samples // 2))
+    )

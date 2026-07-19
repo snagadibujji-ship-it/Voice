@@ -6,7 +6,9 @@ from pathlib import Path
 from typing import Iterable
 
 
-def save_wav(path: str | Path, audio: Iterable[float], sample_rate: int = 22050) -> None:
+def save_wav(
+    path: str | Path, audio: Iterable[float], sample_rate: int = 22050
+) -> None:
     samples = array("h")
     for sample in audio:
         clipped = max(-1.0, min(1.0, float(sample)))

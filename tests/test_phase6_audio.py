@@ -8,4 +8,7 @@ def test_phase6_generates_speech_and_music_audio():
     assert len(result["speech_audio"]) > 1000
     assert len(result["music_audio"]) > 1000
     assert result["personality_memory"]["favorite_voice"] == "axima"
-    assert result["fusion_plan"]["overlay_mode"] in {"speech_with_soft_music", "speech_only"}
+    assert result["fusion_plan"]["overlay_mode"] in {
+        "speech_with_soft_music",
+        "speech_only",
+    }

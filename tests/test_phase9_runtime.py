@@ -3,7 +3,9 @@ from axima_voice import AximaVoice
 
 def test_phase9_runtime_controls_and_audio():
     voice = AximaVoice()
-    result = voice.synthesize("Hello Gowtham, and welcome back because we are going live now")
+    result = voice.synthesize(
+        "Hello Gowtham, and welcome back because we are going live now"
+    )
 
     phase9 = result["phase9_plan"]
     speech_audio = result["speech_audio"]

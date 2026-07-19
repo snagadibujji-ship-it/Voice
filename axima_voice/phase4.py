@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, List
 
 from .phase3 import StreamingPlan, StreamChunk
 
@@ -48,7 +48,9 @@ class LivePlaybackPlan:
         }
 
 
-def build_live_playback_plan(streaming_plan: StreamingPlan, audio_length: int, sample_rate: int = 22050) -> LivePlaybackPlan:
+def build_live_playback_plan(
+    streaming_plan: StreamingPlan, audio_length: int, sample_rate: int = 22050
+) -> LivePlaybackPlan:
     chunks = streaming_plan.chunks
     if not chunks:
         chunks = [StreamChunk(index=0, text="", audio_hint="empty", pause_after=0.0)]
@@ -58,7 +60,11 @@ def build_live_playback_plan(streaming_plan: StreamingPlan, audio_length: int, s
     cursor = 0
     for i, chunk in enumerate(chunks):
         start = cursor
-        end = audio_length if i == len(chunks) - 1 else min(audio_length, cursor + samples_per_chunk)
+        end = (
+            audio_length
+            if i == len(chunks) - 1
+            else min(audio_length, cursor + samples_per_chunk)
+        )
         cursor = end
         duration_ms = int(((end - start) / max(1, sample_rate)) * 1000)
         playback_chunks.append(

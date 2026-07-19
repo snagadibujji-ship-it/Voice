@@ -25,7 +25,9 @@ class PerformanceGraph:
         }
 
 
-def build_performance_graph(text: str, meaning: Dict[str, Any], prosody: Dict[str, Any]) -> PerformanceGraph:
+def build_performance_graph(
+    text: str, meaning: Dict[str, Any], prosody: Dict[str, Any]
+) -> PerformanceGraph:
     tokens = [t for t in text.split(" ") if t]
     mood = meaning.get("mood", "neutral")
     energy = float(prosody.get("energy", 1.0))

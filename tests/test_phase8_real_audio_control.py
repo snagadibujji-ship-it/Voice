@@ -3,7 +3,9 @@ from axima_voice import AximaVoice
 
 def test_phase8_real_audio_control_and_output():
     voice = AximaVoice()
-    result = voice.synthesize("Hello Gowtham, make the voice more alive and expressive now")
+    result = voice.synthesize(
+        "Hello Gowtham, make the voice more alive and expressive now"
+    )
 
     phase8 = result["phase8_plan"]
     speech_audio = result["speech_audio"]

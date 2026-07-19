@@ -3,10 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import Enum
 from time import perf_counter
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from .runtime_chunks import RuntimeChunkResult
-from .runtime_engine import RuntimeState
 from .streaming_metrics import StreamingMetrics
 
 
@@ -54,27 +53,46 @@ class PlaybackEngine:
     _last_chunk_ms: Optional[float] = None
 
     def interrupt_stream(self) -> None:
-        self.interrupted = True
-        self.state = PlaybackState.INTERRUPTED
+        if self.state == PlaybackState.PLAYING:
+            self.interrupted = True
+            self.metrics.interrupt_latency_ms = self._elapsed_since_start()
+            self.state = PlaybackState.INTERRUPTED
 
     def pause_stream(self) -> None:
-        if self.state in {PlaybackState.PLAYING, PlaybackState.RESUMING, PlaybackState.BUFFERING}:
+        if self.state in {
+            PlaybackState.PLAYING,
+            PlaybackState.RESUMING,
+            PlaybackState.BUFFERING,
+        }:
             self.paused = True
             self.state = PlaybackState.PAUSED
 
     def resume_stream(self) -> None:
         if self.state in {PlaybackState.PAUSED, PlaybackState.INTERRUPTED}:
+            resume_start = perf_counter() * 1000.0
             self.paused = False
             self.resumed = True
+            self.metrics.resume_latency_ms = resume_start - (
+                self._last_chunk_ms or self._start_ms or resume_start
+            )
             self.state = PlaybackState.RESUMING
 
     def continue_stream(self) -> None:
-        if self.state in {PlaybackState.RESUMING, PlaybackState.PAUSED, PlaybackState.INTERRUPTED}:
+        if self.state in {
+            PlaybackState.RESUMING,
+            PlaybackState.PAUSED,
+            PlaybackState.INTERRUPTED,
+        }:
             self.paused = False
             self.interrupted = False
             self.state = PlaybackState.PLAYING
 
-    def play(self, chunk_results: List[RuntimeChunkResult], predictive_opening: List[float] | None = None) -> PlaybackExecutionResult:
+    def play(
+        self,
+        chunk_results: List[RuntimeChunkResult],
+        predictive_opening: List[float] | None = None,
+        on_chunk_start: Callable[["PlaybackEngine", int], None] | None = None,
+    ) -> PlaybackExecutionResult:
         self.state = PlaybackState.BUFFERING
         self._start_ms = perf_counter() * 1000.0
         output: List[float] = list(predictive_opening or [])
@@ -84,6 +102,10 @@ class PlaybackEngine:
 
         for index, chunk in enumerate(chunk_results):
             self.current_chunk_index = index
+            if on_chunk_start is not None:
+                on_chunk_start(self, index)
+            if self.state == PlaybackState.RESUMING:
+                self.state = PlaybackState.PLAYING
             if self.interrupted:
                 self.metrics.interrupt_latency_ms = self._elapsed_since_start()
                 self.state = PlaybackState.INTERRUPTED
@@ -93,9 +115,13 @@ class PlaybackEngine:
                 break
             chunk_start = perf_counter() * 1000.0
             if self.metrics.first_audio_latency_ms is None and chunk.audio:
-                self.metrics.first_audio_latency_ms = chunk_start - (self._start_ms or chunk_start)
+                self.metrics.first_audio_latency_ms = chunk_start - (
+                    self._start_ms or chunk_start
+                )
             output.extend(chunk.audio)
-            self.metrics.chunk_latency_ms.append(perf_counter() * 1000.0 - chunk_start)
+            playback_latency = perf_counter() * 1000.0 - chunk_start
+            self.metrics.chunk_latency_ms.append(playback_latency)
+            self.metrics.chunk_playback_latency_ms.append(playback_latency)
             self.metrics.chunks_completed += 1
             self.metrics.chunks_generated += 1
             self._last_chunk_ms = perf_counter() * 1000.0
@@ -103,6 +129,7 @@ class PlaybackEngine:
         if not self.interrupted and not self.paused:
             self.state = PlaybackState.FINISHED
         self.metrics.total_generation_ms = self._elapsed_since_start()
+        self.metrics.stream_duration_ms = self.metrics.total_generation_ms
         return PlaybackExecutionResult(
             audio=output,
             state=self.state,
